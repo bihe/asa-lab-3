@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<!-- layout is necessary for the composition of HTML fragments -->
+<!-- all HTML partials are combined into the "parent" layout which is defined in layouts/main-layout.html -->
+<!-- the reason is to have on central HTML definition (with headers, styles, ... ) and derive all partials -->
+<!-- from the base-layout -->
+<!-- the attribute "layout:decorate" points to the layout to use (hint: you could have more layouts!)-->
+<html
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:th="http://www.thymeleaf.org"
+    layout:decorate="~{layouts/main-layout}">
+
+<head>
+   <title>Restaurant Overview</title>
+</head>
+
+<body>
+
+    <!-- by specifying "layout:fragment" the content-area of the main-layout is referenced -->
+    <!-- meaning that the following content replaces the content area defined in the main-layout -->
+    <!-- the last parameter "th:remove" tell the template engine, that the enclosing tag in the main-layout is removed from the final render result-->
+    <!-- that means the parent div in main-layout will not be found in the rendered output -->
+    <main layout:fragment="content" th:remove="tag">
+
+
+        <div class="container">
+
+            <div class="row"  style="padding-top:20px;">
+              <div class="col-8">
+                <h2>Restaurants</h2>
+              </div>
+              <div class="col-4 clearfix">
+                <a href="/" class="btn btn-secondary"><i class="bi bi-backspace"></i> Back</a>
+                &nbsp;
+                <a href="/restaurant/add" class="btn btn-success float-end"><i class="bi bi-plus-circle"></i> Add</a>
+              </div>
+            </div>
+
+        </div>
+
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each ="restaurant : ${restaurants}">
+                    <td th:utext="${restaurant.id}">...</td>
+                    <td>
+                        <i class="bi bi-pencil-square"></i> <a th:href="'/restaurant/edit/' + ${restaurant.id}" th:utext="${restaurant.name}"></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </main>
+
+</body>
+</html>

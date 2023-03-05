@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/img/apple-touch-icon.png}">
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/img/favicon-32x32.png}">
+    <link rel="icon" type="image/png" sizes="16x16" th:href="@{/img/favicon-16x16.png}">
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+  </head>
+  <body style="background-color: rgba(33,37,41);">
+    <div class="container">
+        <div class="bg-dark text-secondary px-4 py-5 text-center">
+            <div class="py-5">
+              <h1 class="display-5 fw-bold text-white">🫢 Wrong input</h1>
+              <div class="col-lg-6 mx-auto">
+                <p class="fs-5 mb-4">This time it is definitely your fault! You supplied something which we cannot work with. Check your input and rethink the stuff you throw at us.</p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                  <a href="/" type="button" class="btn btn-outline-info btn-lg px-4 me-sm-3 fw-bold">Back Home</a>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+  </body>
+</html>

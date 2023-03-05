@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:th="http://www.thymeleaf.org"
+    layout:decorate="~{layouts/main-layout}">
+<head>
+   <title>Restaurant</title>
+</head>
+
+<body>
+
+    <main layout:fragment="content" th:remove="tag">
+
+        <div class="container">
+
+            <div class="row"  style="padding-top:20px;">
+                <div class="col-12">
+                    <h2 th:if="${restaurantForm.id == 0 || restaurantForm.id == null}">Add Restaurant</h2>
+                    <h2 th:if="${restaurantForm.id > 0}">Edit Restaurant</h2>
+                </div>
+            </div>
+
+            <div class="row"  th:if="${error} != null">
+                <div class="col-12">
+                    <div class="alert alert-danger" role="alert" th:utext="${error}">
+                    error
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" >
+                <div class="col-12">
+                    <form th:action="@{/restaurant/save}" th:object="${restaurantForm}" method="POST" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <input type="hidden" id="id" th:field="*{id}" />
+
+                            <label for="name" class="form-label">Restaurant Name</label>
+                            <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="name your restaurant" required="true">
+                            <div class="invalid-feedback">
+                                Please specify the name of the restaurant!
+                            </div>
+                        </div>
+
+                        <a href="/restaurant" class="btn btn-secondary"><i class="bi bi-backspace"></i> Back</a>
+
+                        <button th:if="${restaurantForm.id == 0 || restaurantForm.id == null}" type="submit" class="btn btn-success"><i class="bi bi-plus-circle"></i> Create</button>
+                        <button th:if="${restaurantForm.id > 0}" type="submit" class="btn btn-warning"><i class="bi bi-plus-circle"></i> Save</button>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+
+</body>
+</html>

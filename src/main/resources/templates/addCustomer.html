@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/main-layout}">
+
+<head>
+   <title>Spring Boot Thymeleaf Hello World Example // add Customer</title>
+</head>
+
+<body>
+
+    <main layout:fragment="content" th:remove="tag">
+
+        <h2>Spring Boot Web Thymeleaf Example Add</h2>
+
+        <form th:action="@{/addCustomer}" th:object="${customerForm}" method="POST">
+            <div class="mb-3">
+                <label for="firstName" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="firstName" th:field="*{firstName}" >
+            </div>
+            <div class="mb-3">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="lastName" th:field="*{lastName}" >
+            </div>
+            <div class="mb-3">
+                <label for="eMail" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="eMail" th:field="*{eMail}">
+                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            </div>
+            <div class="mb-3">
+                <label for="tel" class="form-label">Telephone</label>
+                <input type="text" class="form-control" id="tel" th:field="*{tel}" >
+            </div>
+            <div class="mb-3">
+                <label for="birthData" class="form-label">Birthdate</label>
+                <input type="date" class="form-control" id="tel" th:field="*{birthDate}" >
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+
+    </main>
+
+</body>
+</html>

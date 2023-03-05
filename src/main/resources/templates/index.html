@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/main-layout}">
+
+<head>
+   <title>Spring Boot Thymeleaf Hello World Example</title>
+</head>
+
+<body>
+
+    <main layout:fragment="content" th:remove="tag">
+
+        <h2>Spring Boot Web Thymeleaf Example Hello</h2>
+
+        <div class="alert alert-success" role="alert">
+            <span th:text="${halloNachricht}"></span>
+        </div>
+
+        <div class="container">
+
+            <div class="row">
+              <div class="col-3">
+                <a href="addCustomer" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Customer</a>
+              </div>
+              <div class="col-3">
+                <a href="/restaurant" class="btn btn-success"><i class="bi bi-box-arrow-up-right"></i> Restaurants</a>
+              </div>
+            </div>
+
+        </div>
+
+
+
+
+        <br/><br/>
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">eMail</th>
+                    <th scope="col">Tel</th>
+                    <th scope="col">Geburtsdatum</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each ="customer : ${customers}">
+                    <td th:utext="${customer.firstName}">...</td>
+                    <td th:utext="${customer.lastName}">...</td>
+                    <td th:utext="${customer.eMail}">...</td>
+                    <td th:utext="${customer.tel}">...</td>
+                    <td th:utext="${customer.birthDate}">...</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </main>
+
+</body>
+</html>
