@@ -2,15 +2,23 @@
 
 In this Lab we are working with [SonarQube](https://www.sonarsource.com/products/sonarqube/) and use it to analyze Software Projects. SonarQube is very widely used and provides software metrics derived from [static code analysis](https://owasp.org/www-community/controls/Static_Code_Analysis). Please note that there are other solutions available performing similar activities as well.
 
+<hr/>
+
 ## 1. Requirements
 
 We are going to work with a locally installed version of SonarQube. There are a couple of options to startup a local instance. Either download a specific released version from the SonarQube homepage or use a docker-compose file to startup an instance.
 
 ### 1.1 Java
 
-We need an installed java version for SonarQube and also for the software examples we are going to analyze. It is very much recommended to use a LTS OpenJDK version. Go to https://adoptium.net/en-GB/ to download the current java LTS version.
+We need an installed java version for SonarQube and also for the software examples we are going to analyze. It is very much recommended to use a **LTS OpenJDK** version. Go to https://adoptium.net/ to download the current java LTS version **Open-JDK-17**.
 
-### 1.2 SonarQube standalone instance
+### 1.2 .NET
+
+The .NET version of Microsoft is available for a number of different platforms (Windows, Mac, Linux) and can be freely downloaded and installed. .NET also uses a LTS approach. The current LTS version is .NET 6.0. Our .NET example uses the current version which is .NET 7.0. Head over to https://dotnet.microsoft.com/en-us/download and install the current version **.NET 7.0**.
+
+### 1.2 SonarQube Installation
+
+#### 1.2.1 SonarQube standalone instance
 
 We will use the 'Community Edition' because it can be used freely without the need for any payment. Download this version from the page https://www.sonarsource.com/products/sonarqube/downloads/.
 
@@ -30,7 +38,7 @@ Removed stale pid file: ./SonarQube.pid
 2023.03.26 14:58:43 INFO  app[][o.s.a.SchedulerImpl] SonarQube is operational
 ```
 
-### 1.3 SonarQube as a container
+#### 1.2.2 SonarQube as a container
 
 If your OS is capable of running containers, SonarQube does not need to be downloaded, starting the SonarQube container image is sufficient to run a local instance.
 
@@ -102,13 +110,15 @@ One of the projects we are going to analyze uses the [ant build system](https://
 brew install ant
 ```
 
+<hr/>
+
 ## 2. Analyze Projects
 
 We are going to analyze Open-Source projects and interpret the scan results / metrics.
 
 ### 2.1 draw.io
 
-Draw.io is a very useful diagram application which can be described as "Microsoft Visio in the Web-Browser". The github page explains draw.io
+[Draw.io](https://github.com/jgraph/drawio) is a very useful diagram application which can be described as "Microsoft Visio in the Web-Browser". The github page explains draw.io
 
 > draw.io is a JavaScript, client-side editor for general diagramming and whiteboarding
 
@@ -116,16 +126,16 @@ To analyze the application the following steps need to be performed:
 
 1. Ensure the local SonarQube instance is running - http://localhost:9000
 2. Create a new SonarQube project in **manual mode**
-3. Enter data DisplaName / Key
-4. Analyze project **Locally**
+3. Enter data DisplaName / Key = `draw.io`
+4. Click Analyze project **Locally**
 5. Create a token
 6. Analyze with **other build** option
 7. Select your OS
 8. clone the git repository to local folder https://github.com/jgraph/drawio
-9. change into the local folder
+9. change into the local folder of the cloned repository (e.g. ./drawio)
 10. change to build folder `./etc/build`
-11. build the project with `ant` and `ant javac`
-12. run the `sonar-scanner`
+11. build the project with `ant` and `ant javac` (optional set `JAVA_HOME` for ant to work properly)
+12. run the installed `sonar-scanner` in the root-folder the draw.io src (NOTE: use relative path to the sonar-scanner location)
 
 ```bash
 sonar-scanner -Dsonar.projectKey=draw.io \
@@ -138,3 +148,54 @@ sonar-scanner -Dsonar.projectKey=draw.io \
 
 13.  Review the imported analyzes results within the SonarQube instance.
 
+## 2.2 dotnet-architecture/eShopOnWeb
+
+The [eShopOnWeb](https://github.com/dotnet-architecture/eShopOnWeb) application demonstrates a best-practice approach for ASP.NET applications by implementing a sample shop/e-commerce solution.
+
+```
+Sample ASP.NET Core reference application, powered by Microsoft, demonstrating a single-process (monolithic) application architecture and deployment model. 
+```
+
+The steps to analyze the application are very similar to the example of draw.io. Just the last steps differ, because there is a dotnet integration option.
+
+1. Ensure the local SonarQube instance is running - http://localhost:9000
+2. Create a new SonarQube project in **manual mode**
+3. Enter data DisplaName / Key = `eShopOnWeb`
+4. Click Analyze project **Locally**
+5. Create a token
+6. Analyze with **.NET** option
+7. Choose build tool **.NET core**
+8. Install the sonar scanner as a dotnet-tool `dotnet tool install --global dotnet-sonarscanner`
+9. clone the git repository to local folder https://github.com/dotnet-architecture/eShopOnWeb
+10. change into the local folder of the cloned repository (e.g. ./eShopOnWeb)
+11. Restore the necessary packages `dotnet restore Everything.sln`
+12. Start sonar-scanner and build
+
+```bash
+dotnet sonarscanner begin /k:"eShopOnWeb" /d:sonar.host.url="http://localhost:9000"  /d:sonar.login="<generated-sonar-key>"
+
+dotnet build Everything.sln
+
+dotnet sonarscanner end /d:sonar.login="<generated-sonar-key>"
+```
+
+13. Review the imported analyzes results within the SonarQube instance.
+
+
+### 2.2.1 Add test-coverage
+
+The sample application provides a number of tests, the test-results can be imported to SonarQube and help to improve the overall analysis. To import the the coverage information the following steps are needed.
+
+1. Install the `dotnet-coverage` tool - `dotnet tool install --global dotnet-coverage`
+2. Prep the sonar-scanner tool to also consider test-coverage; build and execute the unit-tests
+
+```bash
+dotnet sonarscanner begin /k:"eShopOnWeb" /d:sonar.host.url="http://localhost:9000"  /d:sonar.login="<generated-sonar-key>" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+
+dotnet build Everything.sln --no-incremental
+dotnet-coverage collect "dotnet test Everything.sln" -f xml -o "coverage.xml"
+
+dotnet sonarscanner end /d:sonar.login="<generated-sonar-key>"
+```
+
+3. Review the imported analyzes results within the SonarQube instance.
