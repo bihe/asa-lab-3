@@ -170,7 +170,10 @@ The steps to analyze the application are very similar to the example of draw.io.
 12. Start sonar-scanner and build
 
 ```bash
-dotnet sonarscanner begin /k:"eShopOnWeb" /d:sonar.host.url="http://localhost:9000"  /d:sonar.login="<generated-sonar-key>"
+dotnet sonarscanner begin \
+  /k:"eShopOnWeb" \
+  /d:sonar.host.url="http://localhost:9000" \
+  /d:sonar.login="<generated-sonar-key>"
 
 dotnet build Everything.sln
 
@@ -188,7 +191,11 @@ The sample application provides a number of tests, the test-results can be impor
 2. Prep the sonar-scanner tool to also consider test-coverage; build and execute the unit-tests
 
 ```bash
-dotnet sonarscanner begin /k:"eShopOnWeb" /d:sonar.host.url="http://localhost:9000"  /d:sonar.login="<generated-sonar-key>" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+dotnet sonarscanner begin \
+  /k:"eShopOnWeb" \
+  /d:sonar.host.url="http://localhost:9000" \
+  /d:sonar.login="<generated-sonar-key>" \
+  /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
 
 dotnet build Everything.sln --no-incremental
 dotnet-coverage collect "dotnet test Everything.sln" -f xml -o "coverage.xml"
