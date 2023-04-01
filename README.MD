@@ -16,9 +16,9 @@ We need an installed java version for SonarQube and also for the software exampl
 
 The .NET version of Microsoft is available for a number of different platforms (Windows, Mac, Linux) and can be freely downloaded and installed. .NET also uses a LTS approach. The current LTS version is .NET 6.0. Our .NET example uses the current version which is .NET 7.0. Head over to https://dotnet.microsoft.com/en-us/download and install the current version **.NET 7.0**.
 
-### 1.2 SonarQube Installation
+### 1.3 SonarQube Installation
 
-#### 1.2.1 SonarQube standalone instance
+#### 1.3.1 SonarQube standalone instance
 
 We will use the 'Community Edition' because it can be used freely without the need for any payment. Download this version from the page https://www.sonarsource.com/products/sonarqube/downloads/.
 
@@ -38,7 +38,7 @@ Removed stale pid file: ./SonarQube.pid
 2023.03.26 14:58:43 INFO  app[][o.s.a.SchedulerImpl] SonarQube is operational
 ```
 
-#### 1.2.2 SonarQube as a container
+#### 1.3.2 SonarQube as a container
 
 If your OS is capable of running containers, SonarQube does not need to be downloaded, starting the SonarQube container image is sufficient to run a local instance.
 
@@ -152,9 +152,7 @@ sonar-scanner -Dsonar.projectKey=draw.io \
 
 The [eShopOnWeb](https://github.com/dotnet-architecture/eShopOnWeb) application demonstrates a best-practice approach for ASP.NET applications by implementing a sample shop/e-commerce solution.
 
-```
-Sample ASP.NET Core reference application, powered by Microsoft, demonstrating a single-process (monolithic) application architecture and deployment model. 
-```
+> Sample ASP.NET Core reference application, powered by Microsoft, demonstrating a single-process (monolithic) application architecture and deployment model. 
 
 The steps to analyze the application are very similar to the example of draw.io. Just the last steps differ, because there is a dotnet integration option.
 
