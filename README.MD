@@ -148,7 +148,7 @@ sonar-scanner -Dsonar.projectKey=draw.io \
 
 13.  Review the imported analyzes results within the SonarQube instance.
 
-## 2.2 dotnet-architecture/eShopOnWeb
+### 2.2 dotnet-architecture/eShopOnWeb
 
 The [eShopOnWeb](https://github.com/dotnet-architecture/eShopOnWeb) application demonstrates a best-practice approach for ASP.NET applications by implementing a sample shop/e-commerce solution.
 
@@ -183,7 +183,7 @@ dotnet sonarscanner end /d:sonar.login="<generated-sonar-key>"
 13. Review the imported analyzes results within the SonarQube instance.
 
 
-### 2.2.1 Add test-coverage
+#### 2.2.1 Add test-coverage
 
 The sample application provides a number of tests, the test-results can be imported to SonarQube and help to improve the overall analysis. To import the the coverage information the following steps are needed.
 
