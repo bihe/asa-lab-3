@@ -51,7 +51,7 @@ First create a local folder where SonarQube will store data, logs and its config
 mkdir -p ./sonardata/data && mkdir -p ./sonardata/extensions && mkdir -p ./sonardata/logs
 
 # windows
-
+# use Explorer.exe ;)
 ```
 
 The following commands will start the SonarQube container (the 'Community Edition' version 9.9).
@@ -101,20 +101,25 @@ SonarQube provides a couple of convenient scanners for common technologies or in
 
 Again there are two possibilities to run the Scanner - download the **zip-file**. Download the OS-specific version or the JVM only version and extract the Scanner into a local directory.
 
-### 1.5 Ant build tool
+### 1.5 Maven build tool
 
-One of the projects we are going to analyze uses the [ant build system](https://ant.apache.org/). Follow the instructions to install ant - https://ant.apache.org/bindownload.cgi or use the convenience tools of your OS:
+We need Maven for one of the projects we are analyzing. Specifically we need a recent version >= **3.8.1**. Go to the [Maven download](https://maven.apache.org/download.cgi) page and install the correct version.
 
-```bash
-# mac
-brew install ant
-```
+### 1.6 Ant build tool
+
+One of the projects we are going to analyze uses the [ant build system](https://ant.apache.org/). Follow the instructions to install ant - https://ant.apache.org/bindownload.cgi.
 
 <hr/>
 
 ## 2. Analyze Projects
 
 We are going to analyze Open-Source projects and interpret the scan results / metrics.
+
+- Draw.io - Online Diagram application (Java and Javascript)
+- eShopOnWeb - Reference .NET application implementing a Shop example (.NET)
+- Jenkins - Well known build server (Java and Javascript)
+
+With this projects we see the different integration possibilities of SonarQube and the coverage of different technology.
 
 ### 2.1 draw.io
 
@@ -131,7 +136,7 @@ To analyze the application the following steps need to be performed:
 5. Create a token
 6. Analyze with **other build** option
 7. Select your OS
-8. clone the git repository to local folder https://github.com/jgraph/drawio
+8. clone the git repository to local folder https://github.com/jgraph/drawio.git (INFO - commit#: `8d9a9926`)
 9. change into the local folder of the cloned repository (e.g. ./drawio)
 10. change to build folder `./etc/build`
 11. build the project with `ant` and `ant javac` (optional set `JAVA_HOME` for ant to work properly)
@@ -164,7 +169,7 @@ The steps to analyze the application are very similar to the example of draw.io.
 6. Analyze with **.NET** option
 7. Choose build tool **.NET core**
 8. Install the sonar scanner as a dotnet-tool `dotnet tool install --global dotnet-sonarscanner`
-9. clone the git repository to local folder https://github.com/dotnet-architecture/eShopOnWeb
+9. clone the git repository to local folder https://github.com/dotnet-architecture/eShopOnWeb.git (INFO - commit#: `8d9a917`)
 10. change into the local folder of the cloned repository (e.g. ./eShopOnWeb)
 11. Restore the necessary packages `dotnet restore Everything.sln`
 12. Start sonar-scanner and build
@@ -204,3 +209,50 @@ dotnet sonarscanner end /d:sonar.login="<generated-sonar-key>"
 ```
 
 3. Review the imported analyzes results within the SonarQube instance.
+
+
+### 2.3 Jenkins CI Server
+
+[Jenkins](https://github.com/jenkinsci/jenkins) is a well known build-server which is very widely used. It is Java based, Open-Source and can be freely used to setup your own build-environment.
+
+> In a nutshell, Jenkins is the leading open-source automation server. Built with Java, it provides over 1,800 plugins to support automating virtually anything, so that humans can spend their time doing things machines cannot.
+
+To analyze the source of Jenkins additional parameters are needed, apart from the description given during the SonarQube setup. Apart from the parameters no additional tools are needed, except for a recent (>= 3.8.1) Maven version.
+
+1. Ensure the local SonarQube instance is running - http://localhost:9000
+2. Create a new SonarQube project in **manual mode**
+3. Enter data DisplaName / Key = `jenkins`
+4. Click Analyze project **Locally**
+5. Create a token
+6. Analyze with **.Maven** option
+7. clone the git repository to local folder https://github.com/jenkinsci/jenkins.git (INFO - commit#: `319dfc6134`)
+8. change into the local folder of the cloned repository (e.g. ./jenkins)
+9. Start maven with goal sonar
+
+```bash
+mvn clean verify sonar:sonar \
+  -Dmaven.test.failure.ignore=true \
+  -Plight-test \
+  -Penable-jacoco \
+  -Dsonar.coverage.jacoco.xmlReportPaths=${PWD}/coverage/target/site/jacoco-aggregate/jacoco.xml \
+  -Dsonar.projectKey=jenkins \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.login=<generated-sonar-key>
+```
+
+10. Review the imported analyzes results within the SonarQube instance.
+
+**NOTE**: A short explanation of the additional parametersl
+
+- **-Dmaven.test.failure.ignore** -> If the full tests are executed, continue even if one test fails
+- **-Plight-test** -> Do not execute ALL tests to be faster. A full test-run takes more than a [hour!]( https://github.com/jenkinsci/jenkins/blob/master/CONTRIBUTING.md#testing-changes)
+- **-Penable-jacoco** -> Collect coverage information with [Jacoco](https://www.jacoco.org/jacoco/)
+- **-Dsonar.coverage.jacoco.xmlReportPaths** -> The path of the combined Jacoco coverage data.
+- -Dsonar.projectKey, -Dsonar.host.url, -Dsonar.login --> Std parameters for SonarQube.
+
+
+<hr/>
+
+After all projects are imported the SonarQube results will look similar to this:
+
+![SonarQube Projects](./.attachments/sonarqube-projects.png)
