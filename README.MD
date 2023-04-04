@@ -12,13 +12,17 @@ We are going to work with a locally installed version of SonarQube. There are a 
 
 We need an installed java version for SonarQube and also for the software examples we are going to analyze. It is very much recommended to use a **LTS OpenJDK** version. Go to https://adoptium.net/ to download the current java LTS version **Open-JDK-17**.
 
-### 1.2 .NET
+### 1.2 Maven build tool
+
+We need Maven for one of the projects we are analyzing. Specifically we need a recent version >= **3.8.1**. Go to the [Maven download](https://maven.apache.org/download.cgi) page and install the correct version.
+
+### 1.3 .NET
 
 The .NET version of Microsoft is available for a number of different platforms (Windows, Mac, Linux) and can be freely downloaded and installed. .NET also uses a LTS approach. The current LTS version is .NET 6.0. Our .NET example uses the current version which is .NET 7.0. Head over to https://dotnet.microsoft.com/en-us/download and install the current version **.NET 7.0**.
 
-### 1.3 SonarQube Installation
+### 1.4 SonarQube Installation
 
-#### 1.3.1 SonarQube standalone instance
+#### 1.4.1 SonarQube standalone instance
 
 We will use the 'Community Edition' because it can be used freely without the need for any payment. Download this version from the page https://www.sonarsource.com/products/sonarqube/downloads/.
 
@@ -38,7 +42,7 @@ Removed stale pid file: ./SonarQube.pid
 2023.03.26 14:58:43 INFO  app[][o.s.a.SchedulerImpl] SonarQube is operational
 ```
 
-#### 1.3.2 SonarQube as a container
+#### 1.4.2 SonarQube as a container
 
 If your OS is capable of running containers, SonarQube does not need to be downloaded, starting the SonarQube container image is sufficient to run a local instance.
 
@@ -95,63 +99,82 @@ Attaching to sonarqube
 sonarqube  | 2023.03.26 13:31:31 INFO  app[][o.s.a.SchedulerImpl] SonarQube is operational
 ```
 
-### 1.4 Sonar Scanner
-
-SonarQube provides a couple of convenient scanners for common technologies or integrations (Gradle, Maven, ant, .NET, AzureDevops, Jenkins). If the project to analyze does not fall within this range of "predefined integrations" the standalone [Sonar Scanner](https://docs.sonarqube.org/latest/analyzing-source-code/scanners/sonarscanner/) can be used.
-
-Again there are two possibilities to run the Scanner - download the **zip-file**. Download the OS-specific version or the JVM only version and extract the Scanner into a local directory.
-
-### 1.5 Maven build tool
-
-We need Maven for one of the projects we are analyzing. Specifically we need a recent version >= **3.8.1**. Go to the [Maven download](https://maven.apache.org/download.cgi) page and install the correct version.
-
-### 1.6 Ant build tool
-
-One of the projects we are going to analyze uses the [ant build system](https://ant.apache.org/). Follow the instructions to install ant - https://ant.apache.org/bindownload.cgi.
-
 <hr/>
 
 ## 2. Analyze Projects
 
 We are going to analyze Open-Source projects and interpret the scan results / metrics.
 
-- Draw.io - Online Diagram application (Java and Javascript)
+- plantUML - A DSL to generate wide variety of UML diagrams (Java)
 - eShopOnWeb - Reference .NET application implementing a Shop example (.NET)
 - Jenkins - Well known build server (Java and Javascript)
 
 With this projects we see the different integration possibilities of SonarQube and the coverage of different technology.
 
-### 2.1 draw.io
+### 2.1 plantUML
 
-[Draw.io](https://github.com/jgraph/drawio) is a very useful diagram application which can be described as "Microsoft Visio in the Web-Browser". The github page explains draw.io
+[plantUML](https://github.com/plantuml/plantuml) is a versatile DSL written in Java which can be used to generate a number of diagram types. It provides the capability to create UML diagrams but is not limited to UML only; Gantt, MindMaps, ER-Diagrams, ...
 
-> draw.io is a JavaScript, client-side editor for general diagramming and whiteboarding
+> Generate diagrams from textual description
 
 To analyze the application the following steps need to be performed:
 
 1. Ensure the local SonarQube instance is running - http://localhost:9000
 2. Create a new SonarQube project in **manual mode**
-3. Enter data DisplaName / Key = `draw.io`
+3. Enter data DisplaName / Key = `plantuml`
 4. Click Analyze project **Locally**
 5. Create a token
-6. Analyze with **other build** option
-7. Select your OS
-8. clone the git repository to local folder https://github.com/jgraph/drawio.git (INFO - commit#: `8d9a9926`)
-9. change into the local folder of the cloned repository (e.g. ./drawio)
-10. change to build folder `./etc/build`
-11. build the project with `ant` and `ant javac` (optional set `JAVA_HOME` for ant to work properly)
-12. run the installed `sonar-scanner` in the root-folder the draw.io src (NOTE: use relative path to the sonar-scanner location)
+6. Analyze with **Gradle** option
+7. Clone the git repository to local folder https://github.com/plantuml/plantuml.git (commit# `b9a27f044`)
+8. Change into the local folder of the cloned repository (e.g. ./plantuml)
+9. Set the Gradle version via the Gradle-Wrapper
 
 ```bash
-sonar-scanner -Dsonar.projectKey=draw.io \
-    -Dsonar.sources=./src \
-    -Dsonar.host.url=http://localhost:9000 \
-    -Dsonar.login=<generated-sonar-key> \
-    -Dsonar.java.binaries=./src/main/webapp/WEB-INF/classes
+# sonarqube gradle plugin does not work with the latest gradle version 8.x
+# https://community.sonarsource.com/t/sonarqube-gradle-task-with-gradle-8-produces-a-crash-on-report-getoutputlocation/81252
+./gradlew wrapper --gradle-version=7.6.1 --distribution-type=bin
+``` 
 
+10. Change the file `build.gradle.kts` file in the cloned git repo in `./plantuml` and enable SonarQube integration
+
+```diff
+--- build.gradle.kts	2023-04-04 18:39:01.512208110 +0200
++++ sonar/build.gradle.kts	2023-04-04 18:38:56.052125037 +0200
+@@ -10,8 +10,28 @@
+ 	java
+ 	`maven-publish`
+ 	signing
++	id("org.sonarqube") version "3.5.0.2730"
++	id("jacoco")
+ }
+ 
++jacoco {
++	toolVersion = "0.8.8"
++}
++
++tasks.jacocoTestReport {
++	reports {
++    		xml.required.set(true)
++    		csv.required.set(false)
++    		html.required.set(false)
++	}
++}
++
++// when subproject has Jacoco pLugin applied we want to generate XML report for coverage
++plugins.withType<JacocoPlugin> {
++	tasks["test"].finalizedBy("jacocoTestReport")
++}
+``` 
+11. Start the gradle build
+
+```bash
+./gradlew test sonar -PjavacRelease=17  \                 
+  -Dsonar.projectKey=plantuml \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.login=<generated-sonar-key>
 ```
 
-13.  Review the imported analyzes results within the SonarQube instance.
+12.   Review the imported analyzes results within the SonarQube instance.
 
 ### 2.2 dotnet-architecture/eShopOnWeb
 
@@ -169,7 +192,7 @@ The steps to analyze the application are very similar to the example of draw.io.
 6. Analyze with **.NET** option
 7. Choose build tool **.NET core**
 8. Install the sonar scanner as a dotnet-tool `dotnet tool install --global dotnet-sonarscanner`
-9. clone the git repository to local folder https://github.com/dotnet-architecture/eShopOnWeb.git (INFO - commit#: `8d9a917`)
+9. clone the git repository to local folder https://github.com/dotnet-architecture/eShopOnWeb.git (commit# `8d9a917`)
 10. change into the local folder of the cloned repository (e.g. ./eShopOnWeb)
 11. Restore the necessary packages `dotnet restore Everything.sln`
 12. Start sonar-scanner and build
@@ -225,7 +248,7 @@ To analyze the source of Jenkins additional parameters are needed, apart from th
 4. Click Analyze project **Locally**
 5. Create a token
 6. Analyze with **.Maven** option
-7. clone the git repository to local folder https://github.com/jenkinsci/jenkins.git (INFO - commit#: `319dfc6134`)
+7. clone the git repository to local folder https://github.com/jenkinsci/jenkins.git (commit# `319dfc6134`)
 8. change into the local folder of the cloned repository (e.g. ./jenkins)
 9. Start maven with goal sonar
 
