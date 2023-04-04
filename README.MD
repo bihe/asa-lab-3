@@ -191,32 +191,11 @@ The steps to analyze the application are very similar to the example of draw.io.
 5. Create a token
 6. Analyze with **.NET** option
 7. Choose build tool **.NET core**
-8. Install the sonar scanner as a dotnet-tool `dotnet tool install --global dotnet-sonarscanner`
-9. clone the git repository to local folder https://github.com/dotnet-architecture/eShopOnWeb.git (commit# `8d9a917`)
-10. change into the local folder of the cloned repository (e.g. ./eShopOnWeb)
-11. Restore the necessary packages `dotnet restore Everything.sln`
+8. Install the `sonar-scanner` as a dotnet-tool `dotnet tool install --global dotnet-sonarscanner`
+9. Install the `dotnet-coverage` tool - `dotnet tool install --global dotnet-coverage`
+10. clone the git repository to local folder https://github.com/dotnet-architecture/eShopOnWeb.git (commit# `8d9a917`)
+11. change into the local folder of the cloned repository (e.g. ./eShopOnWeb)
 12. Start sonar-scanner and build
-
-```bash
-dotnet sonarscanner begin \
-  /k:"eShopOnWeb" \
-  /d:sonar.host.url="http://localhost:9000" \
-  /d:sonar.login="<generated-sonar-key>"
-
-dotnet build Everything.sln
-
-dotnet sonarscanner end /d:sonar.login="<generated-sonar-key>"
-```
-
-13. Review the imported analyzes results within the SonarQube instance.
-
-
-#### 2.2.1 Add test-coverage
-
-The sample application provides a number of tests, the test-results can be imported to SonarQube and help to improve the overall analysis. To import the the coverage information the following steps are needed.
-
-1. Install the `dotnet-coverage` tool - `dotnet tool install --global dotnet-coverage`
-2. Prep the sonar-scanner tool to also consider test-coverage; build and execute the unit-tests
 
 ```bash
 dotnet sonarscanner begin \
@@ -231,7 +210,7 @@ dotnet-coverage collect "dotnet test Everything.sln" -f xml -o "coverage.xml"
 dotnet sonarscanner end /d:sonar.login="<generated-sonar-key>"
 ```
 
-3. Review the imported analyzes results within the SonarQube instance.
+13. Review the imported analyzes results within the SonarQube instance.
 
 
 ### 2.3 Jenkins CI Server
@@ -247,7 +226,7 @@ To analyze the source of Jenkins additional parameters are needed, apart from th
 3. Enter data DisplaName / Key = `jenkins`
 4. Click Analyze project **Locally**
 5. Create a token
-6. Analyze with **.Maven** option
+6. Analyze with **Maven** option
 7. clone the git repository to local folder https://github.com/jenkinsci/jenkins.git (commit# `319dfc6134`)
 8. change into the local folder of the cloned repository (e.g. ./jenkins)
 9. Start maven with goal sonar
