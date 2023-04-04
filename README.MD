@@ -182,7 +182,7 @@ The [eShopOnWeb](https://github.com/dotnet-architecture/eShopOnWeb) application 
 
 > Sample ASP.NET Core reference application, powered by Microsoft, demonstrating a single-process (monolithic) application architecture and deployment model. 
 
-The steps to analyze the application are very similar to the example of draw.io. Just the last steps differ, because there is a dotnet integration option.
+The steps to analyze the application are very similar to the example of plantUML. Just the last steps differ, because there is a dotnet integration option.
 
 1. Ensure the local SonarQube instance is running - http://localhost:9000
 2. Create a new SonarQube project in **manual mode**
@@ -219,7 +219,7 @@ dotnet sonarscanner end /d:sonar.login="<generated-sonar-key>"
 
 > In a nutshell, Jenkins is the leading open-source automation server. Built with Java, it provides over 1,800 plugins to support automating virtually anything, so that humans can spend their time doing things machines cannot.
 
-To analyze the source of Jenkins additional parameters are needed, apart from the description given during the SonarQube setup. Apart from the parameters no additional tools are needed, except for a recent (>= 3.8.1) Maven version.
+To analyze the source of Jenkins additional parameters are needed, apart from the description given during the SonarQube setup. No additional tools are needed, except for a recent (>= 3.8.1) Maven version.
 
 1. Ensure the local SonarQube instance is running - http://localhost:9000
 2. Create a new SonarQube project in **manual mode**
