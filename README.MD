@@ -8,6 +8,8 @@ In this Lab we are working with [SonarQube](https://www.sonarsource.com/products
 
 We are going to work with a locally installed version of SonarQube. There are a couple of options to startup a local instance. Either download a specific released version from the SonarQube homepage or use a docker-compose file to startup an instance.
 
+As we build projects locally and run unit-tests we need some SDKs, and other requirements to perform this task.
+
 ### 1.1 Java
 
 We need an installed java version for SonarQube and also for the software examples we are going to analyze. It is very much recommended to use a **LTS OpenJDK** version. Go to https://adoptium.net/ to download the current java LTS version **Open-JDK-17**.
