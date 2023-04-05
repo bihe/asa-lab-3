@@ -99,15 +99,22 @@ Attaching to sonarqube
 sonarqube  | 2023.03.26 13:31:31 INFO  app[][o.s.a.SchedulerImpl] SonarQube is operational
 ```
 
+### 1.5 Sonar Scanner
+
+SonarQube provides a couple of convenient scanners for common technologies or integrations (Gradle, Maven, ant, .NET, AzureDevops, Jenkins). If the project to analyze does not fall within this range of "predefined integrations" the standalone [Sonar Scanner](https://docs.sonarqube.org/latest/analyzing-source-code/scanners/sonarscanner/) can be used.
+
+Again there are two possibilities to run the Scanner - download the **zip-file**. Download the OS-specific version or the JVM only version and extract the Scanner into a local directory.
+
 <hr/>
 
 ## 2. Analyze Projects
 
 We are going to analyze Open-Source projects and interpret the scan results / metrics.
 
-- plantUML - A DSL to generate wide variety of UML diagrams (Java)
-- eShopOnWeb - Reference .NET application implementing a Shop example (.NET)
-- Jenkins - Well known build server (Java and Javascript)
+- **plantUML** - A DSL to generate wide variety of UML diagrams (Java)
+- **eShopOnWeb** - Reference .NET application implementing a Shop example (.NET)
+- **Jenkins** - Well known build server (Java and Javascript)
+- **VSCode** - The extendable Open-Source Editor (Javascript/Typescript)
 
 With this projects we see the different integration possibilities of SonarQube and the coverage of different technology.
 
@@ -252,6 +259,63 @@ mvn clean verify sonar:sonar \
 - **-Dsonar.coverage.jacoco.xmlReportPaths** -> The path of the combined Jacoco coverage data.
 - -Dsonar.projectKey, -Dsonar.host.url, -Dsonar.login --> Std parameters for SonarQube.
 
+### 2.4 VSCode
+
+[VSCode](https://github.com/microsoft/vscode) is a very successful Open-Source Editor published by Microsoft. It is Javascript/Typescript based using the [Electron](https://github.com/electron/electron) runtime and can be used on Windows/Mac/Linux. 
+
+> Code editing. Redefined. Free. Built on open source. Runs everywhere.
+
+VSCode can also be analyzed by SonarQube. To enable this, it is necessary to check the build-requirements defined on the VSCode GitHub page: https://github.com/microsoft/vscode/wiki/How-to-Contribute
+
+- Git
+- Node.JS
+- Yarn 1
+- Python
+- C/C++ compiler
+
+If you follow the instructions, a local build is possible. VSCode provides tests which generate coverage information. Those can be imported into SonarQube as well. There is a separate description for testing of VSCode: https://github.com/microsoft/vscode/blob/main/test/unit/README.md
+
+The steps to analyze the project and import into SonarQube are as follows:
+
+1. Ensure the local SonarQube instance is running - http://localhost:9000
+2. Create a new SonarQube project in **manual mode**
+3. Enter data DisplaName / Key = `vscode`
+4. Click Analyze project **Locally**
+5. Create a token
+6. Analyze with **Other** option
+7. Selecte your **OS** and work with `sonar-scanner`
+8. Clone the git repository to local folder https://github.com/microsoft/vscode.git (commit# `59ec5734f1e`)
+9. Change into the local folder of the cloned repository (e.g. ./vscode)
+10. Execute yarn to generate a build --> `yarn`
+11. Start the local build of VSCode once `./scripts/code.sh` --> the folder `out` will be created
+12. Start tests with coverage `./scripts/test.sh --coverage` --> coverage-info will be created in `.build/coverage`
+13. Change the .gitignore file and remove the `out` folder, needed because coverage uses the path `out` and sonar-scanner would skip the folder for analysis based on .gitignore.
+
+```diff
+--- .gitignore	2023-04-05 12:51:40.913287644 +0200
++++ .gitignore.sonar	2023-04-05 18:44:57.878453679 +0200
+@@ -5,7 +5,6 @@
+ node_modules/
+ .build/
+ extensions/**/dist/
+-/out*/
+ /extensions/**/out/
+ build/node_modules
+ coverage/
+```
+
+14. Use sonar-scanner to analyze the vscode source
+
+```bash
+sonar-scanner \
+  -Dsonar.projectKey=vscode \
+  -Dsonar.sources=${PWD}/out \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.javascript.lcov.reportPaths=${PWD}/.build/coverage/lcov.info \
+  -Dsonar.login=<generated-sonar-key> 
+```
+
+15. Review the imported analyzes results within the SonarQube instance.
 
 <hr/>
 
