@@ -286,8 +286,16 @@ The steps to analyze the project and import into SonarQube are as follows:
 5. Create a token
 6. Analyze with **Other** option
 7. Selecte your **OS** and work with `sonar-scanner`
-8. Clone the git repository to local folder https://github.com/microsoft/vscode.git (commit# `59ec5734f1e`)
-9. Change into the local folder of the cloned repository (e.g. ./vscode)
+8. Clone the git repository to local folder https://github.com/microsoft/vscode.git (commit# `59ec5734f1e`) 
+9.  Change into the local folder of the cloned repository (e.g. ./vscode) 
+
+**NOTE**: The *rate of change* in the VSCode Repo is **dramatic**, so it can happen, that the latest commit does not work as described in this documentation. Before your start set the local repo to the working commit-hash.
+
+```bash
+# change the local working copy to the specific git hash
+git reset --hard 59ec5734f1e
+```
+
 10. Execute yarn to generate a build --> `yarn`
 11. Start the local build of VSCode once `./scripts/code.sh` --> the folder `out` will be created
 12. Start tests with coverage `./scripts/test.sh --coverage` --> coverage-info will be created in `.build/coverage`
