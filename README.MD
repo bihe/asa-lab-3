@@ -20,7 +20,7 @@ We need Maven for one of the projects we are analyzing. Specifically we need a r
 
 ### 1.3 .NET
 
-The .NET version of Microsoft is available for a number of different platforms (Windows, Mac, Linux) and can be freely downloaded and installed. .NET also uses a LTS approach. The current LTS version is .NET 6.0. Our .NET example uses the current version which is .NET 7.0. Head over to https://dotnet.microsoft.com/en-us/download and install the current version **.NET 7.0**.
+The .NET version of Microsoft is available for a number of different platforms (Windows, Mac, Linux) and can be freely downloaded and installed. .NET also uses a LTS approach. The current LTS version is .NET 8.0. Head over to https://dotnet.microsoft.com/en-us/download and install the LTS version **.NET 8.0**.
 
 ### 1.4 SonarQube Installation
 
@@ -53,14 +53,15 @@ SonarQube has documentation of running a container version: https://github.com/S
 First create a local folder where SonarQube will store data, logs and its configuration. 
 
 ```bash
-# linux/mac
+# linux/mac with bash/zsh/...
 mkdir -p ./sonardata/data && mkdir -p ./sonardata/extensions && mkdir -p ./sonardata/logs
-
-# windows
-# use Explorer.exe ;)
+```
+```powershell
+# windows with powershell (use: https://github.com/PowerShell/PowerShell)
+New-Item ".\sonardata\data" -Type Directory ; New-Item ".\sonardata\extensions" -Type Directory ; New-Item ".\sonardata\logs" -Type Directory
 ```
 
-The following commands will start the SonarQube container (the 'Community Edition' version 9.9).
+The following commands will start the SonarQube container (the 'Community Edition' / LTS Version).
 
 ```bash
 # linux/mac
@@ -68,7 +69,16 @@ docker run \
     -v $(PWD)/sonardata/data:/opt/sonarqube/data \
     -v $(PWD)/sonardata/extensions:/opt/sonarqube/extensions \
     -v $(PWD)/sonardata/logs:/opt/sonarqube/logs \
-    --name="sonarqube" -p 9000:9000 sonarqube:9.9-community
+    --name="sonarqube" -p 9000:9000 sonarqube:lts-community
+```
+
+```powershell
+# windows with powershell
+docker run `
+    -v "$pwd/sonardata/data:/opt/sonarqube/data" `
+    -v "$pwd/sonardata/extensions:/opt/sonarqube/extensions" `
+    -v "$pwd/sonardata/logs:/opt/sonarqube/logs" `
+    --name="sonarqube" -p 9000:9000 sonarqube:lts-community
 ```
 
 The same can be achieved by using a docker compose file like the following.
@@ -78,7 +88,7 @@ The same can be achieved by using a docker compose file like the following.
 version: "3"
 services:
   sonarqube:
-    image: sonarqube:9.9-community
+    image: sonarqube:lts-community
     container_name: sonarqube
     volumes:
       - ./sonardata/data:/opt/sonarqube/data
@@ -91,7 +101,7 @@ services:
 To run the compose file execute the following command:
 
 ```bash
-docker-compose -f compose.yaml up
+docker-compose -f ./compose.yaml up
 
 # output
 [+] Running 1/1
@@ -100,6 +110,8 @@ Attaching to sonarqube
 ...
 sonarqube  | 2023.03.26 13:31:31 INFO  app[][o.s.a.SchedulerImpl] SonarQube is operational
 ```
+
+**NOTE**: On first start the default admin-credentials need to be used `admin:admin`
 
 ### 1.5 Sonar Scanner
 
@@ -114,9 +126,8 @@ Again there are two possibilities to run the Scanner - download the **zip-file**
 We are going to analyze Open-Source projects and interpret the scan results / metrics.
 
 - **plantUML** - A DSL to generate wide variety of UML diagrams (Java)
-- **eShopOnWeb** - Reference .NET application implementing a Shop example (.NET)
-- **Jenkins** - Well known build server (Java and Javascript)
-- **VSCode** - The extendable Open-Source Editor (Javascript/Typescript)
+- **eShop** - Reference .NET application implementing a Shop example (.NET)
+- **Jenkins** - Well known build server (Java)
 
 With this projects we see the different integration possibilities of SonarQube and the coverage of different technology.
 
@@ -134,14 +145,16 @@ To analyze the application the following steps need to be performed:
 4. Click Analyze project **Locally**
 5. Create a token
 6. Analyze with **Gradle** option
-7. Clone the git repository to local folder https://github.com/plantuml/plantuml.git (commit# `b9a27f044`)
+7. Clone the git repository to local folder https://github.com/plantuml/plantuml.git 
+  - use shallow clone `git clone --depth 1`
+  - use specific commit# `a0be1ed`
 8. Change into the local folder of the cloned repository (e.g. ./plantuml)
-9. Set the Gradle version via the Gradle-Wrapper
+9.  Set the Gradle version via the Gradle-Wrapper
 
 ```bash
-# sonarqube gradle plugin does not work with the latest gradle version 8.x
+# sonarqube gradle plugin does not work with the latest gradle version 8.x/9.x
 # https://community.sonarsource.com/t/sonarqube-gradle-task-with-gradle-8-produces-a-crash-on-report-getoutputlocation/81252
-./gradlew wrapper --gradle-version=7.6.1 --distribution-type=bin
+./gradlew wrapper --gradle-version=7.6.4 --distribution-type=bin
 ``` 
 
 10. Change the file `build.gradle.kts` file in the cloned git repo in `./plantuml` and enable SonarQube integration
@@ -158,7 +171,7 @@ To analyze the application the following steps need to be performed:
  }
  
 +jacoco {
-+	toolVersion = "0.8.8"
++	toolVersion = "0.8.11"
 +}
 +
 +tasks.jacocoTestReport {
@@ -177,7 +190,7 @@ To analyze the application the following steps need to be performed:
 11. Start the gradle build
 
 ```bash
-./gradlew test sonar -PjavacRelease=17  \                 
+./gradlew test sonar -PjavacRelease=21  \                 
   -Dsonar.projectKey=plantuml \
   -Dsonar.host.url=http://localhost:9000 \
   -Dsonar.login=<generated-sonar-key>
@@ -185,11 +198,11 @@ To analyze the application the following steps need to be performed:
 
 12.   Review the imported analyzes results within the SonarQube instance.
 
-### 2.2 dotnet-architecture/eShopOnWeb
+### 2.2 dotnet/eShop
 
-The [eShopOnWeb](https://github.com/dotnet-architecture/eShopOnWeb) application demonstrates a best-practice approach for ASP.NET applications by implementing a sample shop/e-commerce solution.
+The [eShop](https://github.com/dotnet/eShop) application demonstrates a best-practice approach for ASP.NET applications by implementing a sample shop/e-commerce solution.
 
-> Sample ASP.NET Core reference application, powered by Microsoft, demonstrating a single-process (monolithic) application architecture and deployment model. 
+> A reference .NET application implementing an eCommerce web site using a services-based architecture. 
 
 The steps to analyze the application are very similar to the example of plantUML. Just the last steps differ, because there is a dotnet integration option.
 
@@ -261,71 +274,9 @@ mvn clean verify sonar:sonar \
 - **-Dsonar.coverage.jacoco.xmlReportPaths** -> The path of the combined Jacoco coverage data.
 - -Dsonar.projectKey, -Dsonar.host.url, -Dsonar.login --> Std parameters for SonarQube.
 
-### 2.4 VSCode
 
-[VSCode](https://github.com/microsoft/vscode) is a very successful Open-Source Editor published by Microsoft. It is Javascript/Typescript based using the [Electron](https://github.com/electron/electron) runtime and can be used on Windows/Mac/Linux. 
 
-> Code editing. Redefined. Free. Built on open source. Runs everywhere.
-
-VSCode can also be analyzed by SonarQube. To enable this, it is necessary to check the build-requirements defined on the VSCode GitHub page: https://github.com/microsoft/vscode/wiki/How-to-Contribute
-
-- Git
-- Node.JS
-- Yarn 1
-- Python
-- C/C++ compiler
-
-If you follow the instructions, a local build is possible. VSCode provides tests which generate coverage information. Those can be imported into SonarQube as well. There is a separate description for testing of VSCode: https://github.com/microsoft/vscode/blob/main/test/unit/README.md
-
-The steps to analyze the project and import into SonarQube are as follows:
-
-1. Ensure the local SonarQube instance is running - http://localhost:9000
-2. Create a new SonarQube project in **manual mode**
-3. Enter data DisplaName / Key = `vscode`
-4. Click Analyze project **Locally**
-5. Create a token
-6. Analyze with **Other** option
-7. Selecte your **OS** and work with `sonar-scanner`
-8. Clone the git repository to local folder https://github.com/microsoft/vscode.git (commit# `59ec5734f1e`) 
-9.  Change into the local folder of the cloned repository (e.g. ./vscode) 
-
-**NOTE**: The *rate of change* in the VSCode Repo is **dramatic**, so it can happen, that the latest commit does not work as described in this documentation. Before your start set the local repo to the working commit-hash.
-
-```bash
-# change the local working copy to the specific git hash
-git reset --hard 59ec5734f1e
-```
-
-10. Execute yarn to generate a build --> `yarn`
-11. Start the local build of VSCode once `./scripts/code.sh` --> the folder `out` will be created
-12. Start tests with coverage `./scripts/test.sh --coverage` --> coverage-info will be created in `.build/coverage`
-13. Change the .gitignore file and remove the `out` folder, needed because coverage uses the path `out` and sonar-scanner would skip the folder for analysis based on .gitignore.
-
-```diff
---- .gitignore	2023-04-05 12:51:40.913287644 +0200
-+++ .gitignore.sonar	2023-04-05 18:44:57.878453679 +0200
-@@ -5,7 +5,6 @@
- node_modules/
- .build/
- extensions/**/dist/
--/out*/
- /extensions/**/out/
- build/node_modules
- coverage/
-```
-
-14. Use sonar-scanner to analyze the vscode source
-
-```bash
-sonar-scanner \
-  -Dsonar.projectKey=vscode \
-  -Dsonar.sources=${PWD}/out \
-  -Dsonar.host.url=http://localhost:9000 \
-  -Dsonar.javascript.lcov.reportPaths=${PWD}/.build/coverage/lcov.info \
-  -Dsonar.login=<generated-sonar-key> 
-```
-
-15. Review the imported analyzes results within the SonarQube instance.
+1.  Review the imported analyzes results within the SonarQube instance.
 
 <hr/>
 
