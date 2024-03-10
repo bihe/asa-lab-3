@@ -12,7 +12,7 @@ As we build projects locally and run unit-tests we need some SDKs, and other req
 
 ### 1.1 Java
 
-We need an installed java version for SonarQube and also for the software examples we are going to analyze. It is very much recommended to use a **LTS OpenJDK** version. Go to https://adoptium.net/ to download the current java LTS version **Open-JDK-17**.
+We need an installed java version for SonarQube and also for the software examples we are going to analyze. It is very much recommended to use a **LTS OpenJDK** version. Go to https://adoptium.net/ to download the current java LTS version **Open-JDK-21**.
 
 ### 1.2 Maven build tool
 
@@ -101,7 +101,7 @@ services:
 To run the compose file execute the following command:
 
 ```bash
-docker-compose -f ./compose.yaml up
+docker compose -f ./compose.yaml up
 
 # output
 [+] Running 1/1
@@ -119,6 +119,15 @@ SonarQube provides a couple of convenient scanners for common technologies or in
 
 Again there are two possibilities to run the Scanner - download the **zip-file**. Download the OS-specific version or the JVM only version and extract the Scanner into a local directory.
 
+### 1.6 Git Fun
+For some projects it is recommended to work with a specific commit id. The only reason for this is, that the projects worked/were tested with this commit. It is quite possible that other commits or [HEAD](https://www.geeksforgeeks.org/git-head/) also work!
+
+To change the a specific commit the following commands are needed:
+
+```bash
+git clone <repository>
+git reset --hard <COMMIT-SHA-ID> # the commit id can be the long or short form
+```
 <hr/>
 
 ## 2. Analyze Projects
@@ -146,8 +155,7 @@ To analyze the application the following steps need to be performed:
 5. Create a token
 6. Analyze with **Gradle** option
 7. Clone the git repository to local folder https://github.com/plantuml/plantuml.git 
-  - use shallow clone `git clone --depth 1`
-  - use specific commit# `a0be1ed`
+  - use specific commit# `a0be1ed` (@see **1.6 Git Fun**)
 8. Change into the local folder of the cloned repository (e.g. ./plantuml)
 9.  Set the Gradle version via the Gradle-Wrapper
 
@@ -198,9 +206,9 @@ To analyze the application the following steps need to be performed:
 
 12.   Review the imported analyzes results within the SonarQube instance.
 
-### 2.2 dotnet/eShop
+### 2.2 dotnet-architecture/eShopOnWeb
 
-The [eShop](https://github.com/dotnet/eShop) application demonstrates a best-practice approach for ASP.NET applications by implementing a sample shop/e-commerce solution.
+The [eShop](https://github.com/dotnet-architecture/eShopOnWeb) application demonstrates a best-practice approach for ASP.NET applications by implementing a sample shop/e-commerce solution.
 
 > A reference .NET application implementing an eCommerce web site using a services-based architecture. 
 
@@ -215,7 +223,7 @@ The steps to analyze the application are very similar to the example of plantUML
 7. Choose build tool **.NET core**
 8. Install the `sonar-scanner` as a dotnet-tool `dotnet tool install --global dotnet-sonarscanner`
 9. Install the `dotnet-coverage` tool - `dotnet tool install --global dotnet-coverage`
-10. clone the git repository to local folder https://github.com/dotnet-architecture/eShopOnWeb.git (commit# `8d9a917`)
+10. clone the git repository to local folder https://github.com/dotnet-architecture/eShopOnWeb (commit# `f34c5a7` - @see **1.6 Git Fun**)
 11. change into the local folder of the cloned repository (e.g. ./eShopOnWeb)
 12. Start sonar-scanner and build
 
@@ -227,7 +235,8 @@ dotnet sonarscanner begin \
   /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
 
 dotnet build Everything.sln --no-incremental
-dotnet-coverage collect "dotnet test Everything.sln" -f xml -o "coverage.xml"
+dotnet test --collect "Code Coverage;Format=cobertura" Everything.sln
+dotnet-coverage merge ./**/*.cobertura.xml -f xml -o "coverage.xml"
 
 dotnet sonarscanner end /d:sonar.login="<generated-sonar-key>"
 ```
@@ -276,7 +285,7 @@ mvn clean verify sonar:sonar \
 
 
 
-1.  Review the imported analyzes results within the SonarQube instance.
+11.  Review the imported analyzes results within the SonarQube instance.
 
 <hr/>
 
