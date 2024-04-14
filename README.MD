@@ -8,7 +8,12 @@ In this Lab we are working with [SonarQube](https://www.sonarsource.com/products
 
 We are going to work with a locally installed version of SonarQube. There are a couple of options to startup a local instance. Either download a specific released version from the SonarQube homepage or use a docker-compose file to startup an instance.
 
-As we build projects locally and run unit-tests we need some SDKs, and other requirements to perform this task.
+As we build projects locally and run unit-tests we need some SDKs, and other requirements to perform this task. 
+
+**NOTE**: Not all requirements are needed for all projects. There is a specific information regarding the required dependencies (also if you have a look at the github pages of the projects you will quickly see which requirements are necessary).
+
+### Primary requirement - a decent shell/terminal
+To execute the commands defined for the different projects a shell/terminal is needed. In a Unix-like environment like Mac/Linux typically a good shell is available out of the box (bash, zsh) in combination with a terminal (terminal, iTerm, Konsole, gnome-terminal, ...). For **Windows** a good combination of shell/terminal is [PowerShell](https://github.com/PowerShell/PowerShell)/[Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/). The commands below either work directly in PowerShell or there is a variant for PowerShell displayed. If you use [cmd.exe](https://en.wikipedia.org/wiki/Cmd.exe), you are without help. Nobody shoul use this old command-interpreter any more!
 
 ### 1.1 Java
 
@@ -146,6 +151,8 @@ With this projects we see the different integration possibilities of SonarQube a
 
 > Generate diagrams from textual description
 
+**DEPENDENCIES**: This project needs: `#Open-JDK-21` 
+
 To analyze the application the following steps need to be performed:
 
 1. Ensure the local SonarQube instance is running - http://localhost:9000
@@ -155,7 +162,7 @@ To analyze the application the following steps need to be performed:
 5. Create a token
 6. Analyze with **Gradle** option
 7. Clone the git repository to local folder https://github.com/plantuml/plantuml.git 
-  - use specific commit# `a0be1ed` (@see **1.6 Git Fun**)
+  - use **specific commit#** `a0be1ed` (@see **1.6 Git Fun**)
 8. Change into the local folder of the cloned repository (e.g. ./plantuml)
 9.  Set the Gradle version via the Gradle-Wrapper
 
@@ -212,6 +219,8 @@ The [eShop](https://github.com/dotnet-architecture/eShopOnWeb) application demon
 
 > A reference .NET application implementing an eCommerce web site using a services-based architecture. 
 
+**DEPENDENCIES**: This project needs: `#.NET 8.0`
+
 The steps to analyze the application are very similar to the example of plantUML. Just the last steps differ, because there is a dotnet integration option.
 
 1. Ensure the local SonarQube instance is running - http://localhost:9000
@@ -250,6 +259,8 @@ dotnet sonarscanner end /d:sonar.login="<generated-sonar-key>"
 
 > In a nutshell, Jenkins is the leading open-source automation server. Built with Java, it provides over 1,800 plugins to support automating virtually anything, so that humans can spend their time doing things machines cannot.
 
+**DEPENDENCIES**: This project needs: `#Open-JDK-21`, `#Maven`
+
 To analyze the source of Jenkins additional parameters are needed, apart from the description given during the SonarQube setup. No additional tools are needed, except for a recent (>= 3.8.1) Maven version.
 
 1. Ensure the local SonarQube instance is running - http://localhost:9000
@@ -258,16 +269,31 @@ To analyze the source of Jenkins additional parameters are needed, apart from th
 4. Click Analyze project **Locally**
 5. Create a token
 6. Analyze with **Maven** option
-7. clone the git repository to local folder https://github.com/jenkinsci/jenkins.git (commit# `319dfc6134`)
+7. clone the git repository to local folder https://github.com/jenkinsci/jenkins.git (commit# `323ad6a4a1` - @see **1.6 Git Fun**)
 8. change into the local folder of the cloned repository (e.g. ./jenkins)
 9. Start maven with goal sonar
 
-```bash
+```bash 
+# (Mac/Linux)
 mvn clean verify sonar:sonar \
   -Dmaven.test.failure.ignore=true \
   -Plight-test \
   -Penable-jacoco \
   -Dsonar.coverage.jacoco.xmlReportPaths=${PWD}/coverage/target/site/jacoco-aggregate/jacoco.xml \
+  -Dsonar.projectKey=jenkins \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.login=<generated-sonar-key>
+```
+
+For windows the current path in powershell is used in a different way:
+
+```powershell 
+# (Windows)
+mvn clean verify sonar:sonar \
+  -Dmaven.test.failure.ignore=true \
+  -Plight-test \
+  -Penable-jacoco \
+  -Dsonar.coverage.jacoco.xmlReportPaths="$pwd/coverage/target/site/jacoco-aggregate/jacoco.xml" \
   -Dsonar.projectKey=jenkins \
   -Dsonar.host.url=http://localhost:9000 \
   -Dsonar.login=<generated-sonar-key>
