@@ -133,6 +133,13 @@ To change the a specific commit the following commands are needed:
 git clone <repository>
 git reset --hard <COMMIT-SHA-ID> # the commit id can be the long or short form
 ```
+
+### 1.7 Windows / Virus-Scanner - Performance Penalty of realtime scanning
+A realtime virus scanning engine like [Windows Defender](https://www.microsoft.com/en-us/windows/comprehensive-security?r=1) sometimes gets in the way during development. As a result compilation (java, ...) can take ages. To speed up the process it can make sense to disable realtime-scanning during compilation or excluce paths in the scan engine (be aware that this has a security impact!)
+
+- [Deactivate Real-Time Scanning](https://support.microsoft.com/en-us/windows/turn-off-defender-antivirus-protection-in-windows-security-99e6004f-c54c-8509-773c-a4d776b77960)
+- [Exclude Folder for Scanning](https://support.microsoft.com/en-us/windows/add-an-exclusion-to-windows-security-811816c0-4dfd-af4a-47e4-c301afe13b26)
+
 <hr/>
 
 ## 2. Analyze Projects
@@ -205,13 +212,14 @@ To analyze the application the following steps need to be performed:
 11. Start the gradle build
 
 ```bash
-./gradlew test sonar -PjavacRelease=21  \                 
+# (Mac/Linux)
+./gradlew test sonar -PjavacRelease=21 \                 
   -Dsonar.projectKey=plantuml \
   -Dsonar.host.url=http://localhost:9000 \
   -Dsonar.login=<generated-sonar-key>
 ```
 
-12.   Review the imported analyzes results within the SonarQube instance.
+12.    Review the imported analyzes results within the SonarQube instance.
 
 ### 2.2 dotnet-architecture/eShopOnWeb
 
